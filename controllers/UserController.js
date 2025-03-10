@@ -36,6 +36,13 @@ class UserController {
     });
   }
 
+  ondEditCancel(){
+    document.querySelector("#box-user-update .btn-cancel").addEventListener('click', e=>{
+      this.showPanelCreate();
+
+    })
+  }
+
   getPhoto(){
 
     return new Promise((resolve, reject) => {
@@ -127,9 +134,16 @@ class UserController {
     <td>${(dataUser.admin) ? 'Sim' : 'Não'}</td>
     <td>${Utils.dateFormat(dataUser.register)}</td>
     <td>
-      <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+      <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
       <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
     </td>`;
+
+    tr.querySelector(".btn-edit").addEventListener("click", e=>{
+      console.log(JSON.parse(tr.dataset.user));
+      this.showPanelUpdate();
+    });
+
+
   this.tableEl.appendChild(tr);
   this.formEl.reset();
 
@@ -138,6 +152,15 @@ class UserController {
 
   
 
+  }
+
+  showPanelCreate(){
+    document.querySelector(".box-success").style.display = 'block';
+    document.querySelector('.box-primary').style.display = 'none'
+  }
+  showPanelUpdate(){
+    document.querySelector(".box-success").style.display = 'none';
+    document.querySelector('.box-primary').style.display = 'block';
   }
 
   updateCount(){
