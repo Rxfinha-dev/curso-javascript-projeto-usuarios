@@ -1,7 +1,10 @@
 class UserController {
-  constructor(formId, tableId) {
-    this.formEl = document.getElementById(formId);
+  constructor(formIdCreate, formIdUpdate, tableId) {
+    this.formEl = document.getElementById(formIdCreate);
+    this.formUpdateEl = document.getElementById(formIdUpdate);
     this.tableEl = document.getElementById(tableId);
+
+    this.onEdit();
   }
 
   onSubmit() {
@@ -12,7 +15,7 @@ class UserController {
 
    // btn.disabled = true;
       
-      let values = this.getValues();
+      let values = this.getValues(this.formEl);
 
       if(!values) return false;
 
@@ -36,9 +39,31 @@ class UserController {
     });
   }
 
-  ondEditCancel(){
-    document.querySelector("#box-user-update .btn-cancel").addEventListener('click', e=>{
+  onEdit(){
+    document.querySelector("#box-user-update .btn-cancel").addEventListener("click", (e)=>{
+      
       this.showPanelCreate();
+
+    })
+
+    this.formUpdateEl.addEventListener("submit", e=>{
+
+      e.preventDefault();
+
+      let btn = this.formUpdateEl.querySelector("[type=submit]");
+
+      btn.disabled = true;
+
+      let value = this.getValues(this.formUpdateEl);
+
+
+      let index = this.formUpdateEl.dataset.trIndex;
+
+      this.tableEl.rows[index].dataset.user = JSON.stringify(value);
+
+
+
+      
 
     })
   }
@@ -73,11 +98,11 @@ class UserController {
     
   }
 
-  getValues() {
+  getValues(formEl) {
     let user = {};
     let isValid = true;
 
-    [...this.formEl.elements].forEach((field, index) => {
+    [...formEl.elements].forEach((field, index) => {
 
       if(['name', 'email', 'password'].indexOf(field.name)> -1 && !field.value ){
 
@@ -139,8 +164,42 @@ class UserController {
     </td>`;
 
     tr.querySelector(".btn-edit").addEventListener("click", e=>{
-      console.log(JSON.parse(tr.dataset.user));
-      this.showPanelUpdate();
+      let json = JSON.parse(tr.dataset.user);
+      let form = document.querySelector('#form-user-update');
+
+      form.dataset.trIndex = tr.sectionRowIndex;
+
+      for(let name in json){
+       let field = form.querySelector('[name= ' + name.replace("_", "") + "]"); 
+
+   
+       
+       if(field){
+        if(field.type=='file') continue;
+
+        switch(field.type){
+          case 'file':
+          continue;
+          break;
+
+          case 'radio':
+            field = form.querySelector('[name= ' + name.replace("_", "") + "][value="+json[name]+"]"); 
+            field.checked = true;
+          break;
+
+          case 'checkbox':
+            field.checked = json[name];
+          break;
+
+          default:
+            field.value = json[name];
+            
+
+        }
+        field.value = json[name];
+       }
+      }
+        this.showPanelUpdate();
     });
 
 
